@@ -5,6 +5,7 @@ class Book {
   String? bookTitle;
   String? bookDesc;
   String? bookAuthor;
+  String? bookStatus;
   String? bookPrice;
   String? bookQty;
   String? bookDate;
@@ -16,6 +17,7 @@ class Book {
       this.bookTitle,
       this.bookDesc,
       this.bookAuthor,
+      this.bookStatus,
       this.bookPrice,
       this.bookQty,
       this.bookDate});
@@ -27,6 +29,7 @@ class Book {
     bookTitle = json['book_title'];
     bookDesc = json['book_desc'];
     bookAuthor = json['book_author'];
+    bookStatus = json['book_status'];
     bookPrice = json['book_price'];
     bookQty = json['book_qty'];
     bookDate = json['book_date'];
@@ -40,6 +43,7 @@ class Book {
     data['book_title'] = bookTitle;
     data['book_desc'] = bookDesc;
     data['book_author'] = bookAuthor;
+    data['book_status'] = bookStatus;
     data['book_price'] = bookPrice;
     data['book_qty'] = bookQty;
     data['book_date'] = bookDate;
