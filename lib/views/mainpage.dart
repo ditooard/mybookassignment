@@ -28,11 +28,12 @@ class _MainPageState extends State<MainPage> {
   int numofresult = 0;
   var color;
   String title = "";
+  String author = "";
 
   @override
   void initState() {
     super.initState();
-    loadBooks(title);
+    loadBooks(title, author);
   }
 
   bool isSearchVisible = false;
@@ -75,97 +76,105 @@ class _MainPageState extends State<MainPage> {
         page: "books",
         userdata: widget.userdata,
       ),
-      body: bookList.isEmpty
-          ? const Center(child: Text("No Data"))
-          : Column(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: Text("Page $curpage/$numofresult"),
-                ),
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: axiscount,
-                    children: List.generate(bookList.length, (index) {
-                      return Card(
-                        child: InkWell(
-                          onTap: () async {
-                            Book book = Book.fromJson(bookList[index].toJson());
-                            await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (content) => BookDetails(
-                                          user: widget.userdata,
-                                          book: book,
-                                        )));
-                            loadBooks(title);
-                          },
-                          child: Column(
-                            children: [
-                              Flexible(
-                                flex: 6,
-                                child: Container(
-                                  width: screenWidth,
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Image.network(
-                                      fit: BoxFit.fill,
-                                      "${MyServerConfig.server}/mybookassignment/assets/books/${bookList[index].bookId}.png"),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Fungsi yang akan dijalankan saat melakukan gestur refresh
+          await refreshBooks(author, title);
+        },
+        child: bookList.isEmpty
+            ? const Center(child: Text("No Data"))
+            : Column(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text("Page $curpage/$numofresult"),
+                  ),
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: axiscount,
+                      children: List.generate(bookList.length, (index) {
+                        return Card(
+                          child: InkWell(
+                            onTap: () async {
+                              Book book =
+                                  Book.fromJson(bookList[index].toJson());
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (content) => BookDetails(
+                                            user: widget.userdata,
+                                            book: book,
+                                          )));
+                              loadBooks(title, author);
+                            },
+                            child: Column(
+                              children: [
+                                Flexible(
+                                  flex: 6,
+                                  child: Container(
+                                    width: screenWidth,
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Image.network(
+                                        fit: BoxFit.fill,
+                                        "${MyServerConfig.server}/mybookassignment/assets/books/${bookList[index].bookId}.png"),
+                                  ),
                                 ),
-                              ),
-                              Flexible(
-                                flex: 4,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      truncateString(
-                                          bookList[index].bookTitle.toString()),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
-                                    Text("RM ${bookList[index].bookPrice}"),
-                                    Text(
-                                        "Available ${bookList[index].bookQty} unit"),
-                                  ],
-                                ),
-                              )
-                            ],
+                                Flexible(
+                                  flex: 4,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        truncateString(bookList[index]
+                                            .bookTitle
+                                            .toString()),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                      Text("RM ${bookList[index].bookPrice}"),
+                                      Text(
+                                          "Available ${bookList[index].bookQty} unit"),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: numofpage,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      //build the list for textbutton with scroll
-                      if ((curpage - 1) == index) {
-                        //set current page number active
-                        color = Colors.red;
-                      } else {
-                        color = Colors.black;
-                      }
-                      return TextButton(
-                          onPressed: () {
-                            curpage = index + 1;
-                            loadBooks(title);
-                          },
-                          child: Text(
-                            (index + 1).toString(),
-                            style: TextStyle(color: color, fontSize: 18),
-                          ));
-                    },
+                  SizedBox(
+                    height: screenHeight * 0.05,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: numofpage,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        //build the list for textbutton with scroll
+                        if ((curpage - 1) == index) {
+                          //set current page number active
+                          color = Colors.red;
+                        } else {
+                          color = Colors.black;
+                        }
+                        return TextButton(
+                            onPressed: () {
+                              curpage = index + 1;
+                              loadBooks(title, author);
+                            },
+                            child: Text(
+                              (index + 1).toString(),
+                              style: TextStyle(color: color, fontSize: 18),
+                            ));
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: newBook,
         child: const Icon(Icons.add),
@@ -199,11 +208,38 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void loadBooks(String title) {
+  Future<void> refreshBooks(String title, author) async {
+    await Future.delayed(Duration(seconds: 2));
     http
         .get(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/load_books.php?title=$title&pageno=$curpage"),
+          "${MyServerConfig.server}/mybookassignment/php/load_books.php?title=$title&author=$author&pageno=$curpage&"),
+    )
+        .then((response) {
+      log(response.body);
+      if (response.statusCode == 200) {
+        log(response.body);
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          bookList.clear();
+          data['data']['books'].forEach((v) {
+            bookList.add(Book.fromJson(v));
+          });
+          numofpage = int.parse(data['numofpage'].toString());
+          numofresult = int.parse(data['numberofresult'].toString());
+        } else {
+          //if no status failed
+        }
+      }
+      setState(() {});
+    });
+  }
+
+  void loadBooks(String title, author) {
+    http
+        .get(
+      Uri.parse(
+          "${MyServerConfig.server}/mybookassignment/php/load_books.php?title=$title&author=$author&pageno=$curpage&"),
     )
         .then((response) {
       log(response.body);
@@ -226,8 +262,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget buildSearchBar() {
-    TextEditingController searchctlr = TextEditingController();
-    title = searchctlr.text;
+    TextEditingController searchCtrl = TextEditingController();
+
     return Stack(
       children: [
         Visibility(
@@ -257,7 +293,7 @@ class _MainPageState extends State<MainPage> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: searchctlr,
+                      controller: searchCtrl,
                       decoration: InputDecoration(
                         hintText: 'Search...',
                         border: InputBorder.none,
@@ -268,7 +304,9 @@ class _MainPageState extends State<MainPage> {
                     icon: Icon(Icons.search),
                     onPressed: () {
                       setState(() {
-                        loadBooks(searchctlr.text);
+                        title = searchCtrl.text;
+                        author = searchCtrl.text;
+                        loadBooks(searchCtrl.text, searchCtrl.text);
                       });
                     },
                   ),
@@ -277,6 +315,7 @@ class _MainPageState extends State<MainPage> {
                     onPressed: () {
                       setState(() {
                         isSearchVisible = false;
+                        searchCtrl.clear();
                       });
                     },
                   ),
