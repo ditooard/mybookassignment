@@ -175,10 +175,10 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: newBook,
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: newBook,
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 
