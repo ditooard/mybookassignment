@@ -7,6 +7,7 @@ import 'package:mybookassignment/models/user.dart';
 import 'package:mybookassignment/shared/mydrawer.dart';
 import 'package:mybookassignment/shared/myserverconfig.dart';
 import 'package:mybookassignment/views/bookdetails.dart';
+import 'package:mybookassignment/views/cartpage.dart';
 import 'package:mybookassignment/views/newbookpage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -175,11 +176,26 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: newBook,
-      //   child: const Icon(Icons.add),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: loadChart,
+        child: const Icon(Icons.shopping_cart),
+      ),
     );
+  }
+
+  void loadChart() {
+    // if (widget.userdata.userid.toString() == "0" ||
+    //     widget.userdata.username.toString() == "Unregistered") {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text("Please register an account"),
+    //     backgroundColor: Colors.red,
+    //   ));
+    // } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoadCartPage()),
+      );
+    // }
   }
 
   void newBook() {
