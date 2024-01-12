@@ -25,6 +25,7 @@ class _BookDetailsState extends State<BookDetails> {
   late double screenWidth, screenHeight;
   final f = DateFormat('dd-MM-yyyy hh:mm a');
   bool bookowner = false;
+  int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -38,75 +39,120 @@ class _BookDetailsState extends State<BookDetails> {
     return Scaffold(
         bottomSheet: Container(
           width: 400,
-          padding: EdgeInsets.all(10), // Set the desired width
-          child: ElevatedButton(
-            onPressed: () {
-              addToCart();
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Set the button's background color
-              onPrimary: Colors.white, // Set the button's text color
-              elevation: 3, // Set the button's elevation
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Set border radius
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Quantity of books to be ordered    : ',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            if (quantity > 1) {
+                              quantity--;
+                            }
+                          });
+                        },
+                      ),
+                      Text('$quantity', style: TextStyle(fontSize: 16)),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            // Use ?? to provide a default value (0 in this case) if bookQty is null
+                            double bookQty =
+                                double.parse(widget.book.bookQty ?? '0');
+
+                            // Now you can compare and increment quantity
+                            if (quantity < bookQty) {
+                              quantity++;
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              padding: EdgeInsets.all(16), // Set padding
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.add_shopping_cart, // Add the shopping cart icon
-                  size: 24,
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  addToCart();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                  onPrimary: Colors.white,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.all(16),
                 ),
-                SizedBox(
-                    width: 8), // Add some spacing between the icon and text
-                Text(
-                  "Add to Cart",
-                  style: TextStyle(fontSize: 16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.add_shopping_cart,
+                      size: 24,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Add to Cart",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         appBar: AppBar(
           title: Text(widget.book.bookTitle.toString()),
-          actions: [
-            PopupMenuButton(itemBuilder: (context) {
-              return [
-                PopupMenuItem<int>(
-                  value: 0,
-                  enabled: bookowner,
-                  child: const Text("Update"),
-                ),
-                PopupMenuItem<int>(
-                  enabled: bookowner,
-                  value: 1,
-                  child: const Text("Delete"),
-                ),
-              ];
-            }, onSelected: (value) {
-              if (value == 0) {
-                if (widget.book.userId == widget.book.userId) {
-                  updateDialog();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Not allowed!!!"),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              } else if (value == 1) {
-                if (widget.book.userId == widget.book.userId) {
-                  deleteDialog();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Not allowed!!!"),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              } else if (value == 2) {}
-            }),
-          ],
+          // actions: [
+          //   PopupMenuButton(itemBuilder: (context) {
+          //     return [
+          //       PopupMenuItem<int>(
+          //         value: 0,
+          //         enabled: bookowner,
+          //         child: const Text("Update"),
+          //       ),
+          //       PopupMenuItem<int>(
+          //         enabled: bookowner,
+          //         value: 1,
+          //         child: const Text("Delete"),
+          //       ),
+          //     ];
+          //   }, onSelected: (value) {
+          //     if (value == 0) {
+          //       if (widget.book.userId == widget.book.userId) {
+          //         updateDialog();
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          //           content: Text("Not allowed!!!"),
+          //           backgroundColor: Colors.red,
+          //         ));
+          //       }
+          //     } else if (value == 1) {
+          //       if (widget.book.userId == widget.book.userId) {
+          //         deleteDialog();
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          //           content: Text("Not allowed!!!"),
+          //           backgroundColor: Colors.red,
+          //         ));
+          //       }
+          //     } else if (value == 2) {}
+          //   }),
+          // ],
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -305,8 +351,7 @@ class _BookDetailsState extends State<BookDetails> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  // Add logic for "Yes" button
-                  // You can add the item to the cart here
+                  insertToCart();
                   Navigator.of(context).pop(); // Close the dialog
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -328,5 +373,50 @@ class _BookDetailsState extends State<BookDetails> {
         },
       );
     }
+  }
+
+  void insertToCart() {
+    http.post(
+      Uri.parse(
+          "${MyServerConfig.server}/mybookassignment/php/insert_cart.php"),
+      body: {
+        "userid": widget.user.userid.toString(),
+        "book_id": widget.book.bookId.toString(),
+        "cart_qty": quantity.toString(),
+      },
+    ).then((response) {
+      if (response.statusCode == 200) {
+        var data = response.body;
+        print("Response body: $data");
+
+        try {
+          var jsonData = jsonDecode(data);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Insert Book Succes."),
+            backgroundColor: Colors.green,
+          ));
+        } catch (e) {
+          print("Error decoding JSON: $e");
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Insert Failed. Error decoding JSON"),
+            backgroundColor: Colors.red,
+          ));
+        }
+      } else {
+        // Penanganan kesalahan status HTTP selain 200
+        print("HTTP Error: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Insert Failed. HTTP Error"),
+          backgroundColor: Colors.red,
+        ));
+      }
+    }).catchError((error) {
+      // Penanganan kesalahan selama request
+      print("Error during HTTP request: $error");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Insert Failed. Error during request"),
+        backgroundColor: Colors.red,
+      ));
+    });
   }
 }

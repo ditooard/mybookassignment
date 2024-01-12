@@ -184,18 +184,20 @@ class _MainPageState extends State<MainPage> {
   }
 
   void loadChart() {
-    // if (widget.userdata.userid.toString() == "0" ||
-    //     widget.userdata.username.toString() == "Unregistered") {
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text("Please register an account"),
-    //     backgroundColor: Colors.red,
-    //   ));
-    // } else {
+    if (widget.userdata.userid.toString() == "0" ||
+        widget.userdata.username.toString() == "Unregistered") {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Please register an account"),
+        backgroundColor: Colors.red,
+      ));
+    } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoadCartPage()),
+        MaterialPageRoute(builder: (context) => LoadCartPage(
+          userdata : widget.userdata,
+        )),
       );
-    // }
+    }
   }
 
   void newBook() {

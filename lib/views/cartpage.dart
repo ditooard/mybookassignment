@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mybookassignment/models/cart.dart';
+import 'package:mybookassignment/models/user.dart';
 
 class LoadCartPage extends StatefulWidget {
+  final User userdata;
+  const LoadCartPage({super.key, required this.userdata});
+
   @override
   _LoadCartPageState createState() => _LoadCartPageState();
 }
 
 class _LoadCartPageState extends State<LoadCartPage> {
-  List<Books> booksInCart = [
-    Books("Book Title 1", 1, 25.0),
-    Books("Book Title 2", 2, 30.0),
-    Books("Book Title 3", 3, 20.0),
-  ];
+  List<Cart> bookList = <Cart>[];
 
   @override
   Widget build(BuildContext context) {
@@ -18,116 +19,64 @@ class _LoadCartPageState extends State<LoadCartPage> {
       appBar: AppBar(
         title: Text("Shopping Cart"),
       ),
-      body: ListView.builder(
-        itemCount: booksInCart.length,
+      body: bookList.isEmpty
+          ? const Center(child: Text("No Data"))
+          : Column(
+  children: [
+    Expanded(
+      child: ListView.builder(
+        itemCount: bookList.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(booksInCart[index].title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Quantity: ${booksInCart[index].quantity}"),
-                Text("Price per book: RM${booksInCart[index].price}"),
-                Text(
-                    "Shipping Cost: RM${calculateShippingCost(booksInCart[index].quantity)}"),
-                Text("Total: RM${calculateTotalPrice(index)}"),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.remove),
-                  onPressed: () {
-                    // Fungsi untuk mengurangi jumlah buku dari keranjang
-                    decrementQuantity(index);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    // Fungsi untuk menambah jumlah buku dari keranjang
-                    incrementQuantity(index);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    // Fungsi untuk menghapus buku dari keranjang
-                    removeBook(index);
-                  },
-                ),
-              ],
+          return Card(
+            child: InkWell(
+              onTap: () async {
+                Book book = Book.fromJson(bookList[index].toJson());
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (content) => BookDetails(
+                      user: widget.userdata,
+                      book: book,
+                    ),
+                  ),
+                );
+                loadBooks(title, author);
+              },
+              child: Column(
+                children: [
+                  Container(
+                    width: screenWidth,
+                    padding: const EdgeInsets.all(4.0),
+                    child: Image.network(
+                      "${MyServerConfig.server}/mybookassignment/assets/books/${bookList[index].bookId}.png",
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        truncateString(bookList[index].bookTitle.toString()),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text("RM ${bookList[index].bookPrice}"),
+                      Text("Available ${bookList[index].bookQty} unit"),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },
       ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "Total Harga: RM${calculateTotalPriceWithShipping()}",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Fungsi untuk melanjutkan ke proses pembayaran atau tindakan selanjutnya
-                // bisa ditambahkan di sini
-              },
-              child: Text("Checkout"),
-            ),
-          ],
-        ),
-      ),
+    ),
+  ],
+),
+
     );
   }
-
-  double calculateTotalPrice(int index) {
-    double total = (booksInCart[index].quantity * booksInCart[index].price) +
-        calculateShippingCost(booksInCart[index].quantity);
-    return total;
-  }
-
-  double calculateShippingCost(int quantity) {
-    return 10.0 * quantity; // Ongkos kirim RM10 per buku
-  }
-
-  double calculateTotalPriceWithShipping() {
-    double totalPrice = 0.0;
-    for (var book in booksInCart) {
-      totalPrice += calculateTotalPrice(booksInCart.indexOf(book));
-    }
-    return totalPrice;
-  }
-
-  void removeBook(int index) {
-    setState(() {
-      booksInCart.removeAt(index);
-    });
-  }
-
-  void incrementQuantity(int index) {
-    setState(() {
-      booksInCart[index].quantity++;
-    });
-  }
-
-  void decrementQuantity(int index) {
-    if (booksInCart[index].quantity > 1) {
-      setState(() {
-        booksInCart[index].quantity--;
-      });
-    }
-  }
-}
-
-class Books {
-  final String title;
-  int quantity;
-  final double price;
-
-  Books(this.title, this.quantity, this.price);
 }
