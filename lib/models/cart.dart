@@ -1,16 +1,16 @@
 class Cart {
-  String? cartId;
-  String? bookId;
-  String? cartQty;
-  String? bookTitle;
-  String? bookPrice;
+  int cartId;
+  int bookId;
+  int cartQty;
+  String bookTitle;
+  double bookPrice;
 
   Cart({
-    this.cartId,
-    this.bookId,
-    this.cartQty,
-    this.bookTitle,
-    this.bookPrice,
+    required this.cartId,
+    required this.bookId,
+    required this.cartQty,
+    required this.bookTitle,
+    required this.bookPrice,
   });
 
   factory Cart.fromJson(Map<String, dynamic> json) {
@@ -19,17 +19,7 @@ class Cart {
       bookId: json['book_id'],
       cartQty: json['cart_qty'],
       bookTitle: json['book_title'],
-      bookPrice: json['book_price'],
+      bookPrice: json['book_price'].toDouble(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['cart_id'] = cartId;
-    data['book_id'] = bookId;
-    data['cart_qty'] = cartQty;
-    data['book_title'] = bookTitle;
-    data['book_price'] = bookPrice;
-    return data;
   }
 }
