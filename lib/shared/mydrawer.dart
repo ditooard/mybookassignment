@@ -74,45 +74,50 @@ class _MyDrawerState extends State<MyDrawer> {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.blue,
+            decoration: BoxDecoration(
+              color: Colors.orange, // Ganti warna latar belakang
             ),
-            currentAccountPicture: const CircleAvatar(
-                foregroundImage: AssetImage('assets/images/profile.png'),
-                backgroundColor: Colors.white),
-            accountName: Text(isUserRegistered
-                ? widget.userdata.username.toString()
-                : widget.userdata.username.toString()),
+            currentAccountPicture: ClipOval(
+              child: Image.asset(
+                'assets/images/profile.png', // Ganti dengan path gambar profil kustom Anda
+                fit: BoxFit.cover,
+                width: 72.0,
+                height: 72.0,
+                color: Colors.white,
+              ),
+            ),
+            accountName: Text(
+              isUserRegistered
+                  ? widget.userdata.username.toString()
+                  : widget.userdata.username.toString(),
+              style: TextStyle(color: Colors.white), // Ganti warna teks
+            ),
             accountEmail: Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(isUserRegistered
-                      ? widget.userdata.useremail.toString()
-                      : widget.userdata.useremail.toString()),
-                  Text("RM100"),
+                  Text(
+                    isUserRegistered
+                        ? widget.userdata.useremail.toString()
+                        : widget.userdata.useremail.toString(),
+                    style: TextStyle(color: Colors.white), // Ganti warna teks
+                  ),
+                  Text(
+                    "RM100",
+                    style: TextStyle(color: Colors.white), // Ganti warna teks
+                  ),
                 ],
               ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.money),
-            title: const Text('Books'),
-            onTap: () {
-              Navigator.pop(context);
-              if (widget.page.toString() == "books") {
-                return;
-              }
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                EnterExitRoute(
-                  exitPage: MainPage(userdata: widget.userdata),
-                  enterPage: MainPage(userdata: widget.userdata),
-                ),
-              );
-            },
+            otherAccountsPictures: [
+              CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.star,
+                    color: Colors.yellow), // Contoh menambahkan ikon bintang
+              ),
+              // Tambahkan widget lain jika diperlukan
+            ],
           ),
           ListTile(
             leading: const Icon(Icons.sell),
@@ -149,41 +154,26 @@ class _MyDrawerState extends State<MyDrawer> {
               );
             },
           ),
-          const Divider(
-            color: Colors.blueGrey,
-          ),
           ListTile(
-            leading: const Icon(Icons.app_registration_rounded),
-            title: const Text('Register'),
+            leading: const Icon(Icons.money),
+            title: const Text('Books'),
             onTap: () {
-              if (widget.page.toString() == "register") {
+              Navigator.pop(context);
+              if (widget.page.toString() == "books") {
                 return;
               }
+              Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (content) => const RegistrationPage(),
+                EnterExitRoute(
+                  exitPage: MainPage(userdata: widget.userdata),
+                  enterPage: MainPage(userdata: widget.userdata),
                 ),
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.login_rounded),
-            title:
-                isUserRegistered ? const Text('Login') : const Text('Logout'),
-            onTap: () {
-              if (isUserRegistered) {
-                print(widget.page.toString());
-                if (widget.page.toString() == "login page") {
-                  //  Navigator.pop(context);
-                  return;
-                }
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (content) => const LoginPage()));
-              } else {
-                showLogoutConfirmationDialog(context);
-              }
-            },
+          const Divider(
+            color: Colors.blueGrey,
           ),
           ListTile(
             leading: const Icon(Icons.verified_user),
@@ -207,6 +197,42 @@ class _MyDrawerState extends State<MyDrawer> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.app_registration_rounded),
+            title: const Text('Register Account'),
+            onTap: () {
+              if (widget.page.toString() == "register") {
+                return;
+              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (content) => const RegistrationPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(
+            color: Colors.blueGrey,
+          ),
+          ListTile(
+            leading: const Icon(Icons.login_rounded),
+            title:
+                isUserRegistered ? const Text('Login') : const Text('Logout'),
+            onTap: () {
+              if (isUserRegistered) {
+                print(widget.page.toString());
+                if (widget.page.toString() == "login page") {
+                  //  Navigator.pop(context);
+                  return;
+                }
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (content) => const LoginPage()));
+              } else {
+                showLogoutConfirmationDialog(context);
+              }
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {
@@ -222,6 +248,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 ),
               );
             },
+          ),
+          const Divider(
+            color: Colors.blueGrey,
           ),
         ],
       ),

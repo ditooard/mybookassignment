@@ -27,14 +27,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     double screemWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: AppBar(title: const Text("Registration Form")),
+        appBar: AppBar(
+            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor : Colors.orange,
+            title: const Text("Registration Form", style: TextStyle(color: Colors.white),)),
         body: SingleChildScrollView(
           child: Center(
             child: Column(children: [
-              Image.asset("assets/images/register.jpg"),
+              Image.asset("assets/images/regis.jpg"),
               Container(
                 width: screemWidth,
-                height: screenHeight,
                 padding: const EdgeInsets.all(16),
                 child: Form(
                   key: _formKey,
@@ -44,7 +46,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                       child: Column(children: [
                         const Text(
-                          "User Registration",
+                          "E-BOOKS Registration",
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         ),

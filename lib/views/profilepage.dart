@@ -24,7 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-            iconTheme: const IconThemeData(color: Colors.black),
+            iconTheme: const IconThemeData(color: Colors.white),
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -32,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text(
                   "My Account",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
                 SizedBox(
@@ -40,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.orange,
             elevation: 0.0,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1.0),
@@ -66,6 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: screenHeight * 0.4,
                   child: Image.asset(
                     'assets/images/profile.png',
+                    color: Colors.orange,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -87,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               height: screenHeight * 0.035,
               alignment: Alignment.center,
-              color: Colors.blue,
+              color: Colors.orange,
               width: screenWidth,
               child: const Text("UPDATE ACCOUNT",
                   textAlign: TextAlign.center,

@@ -17,7 +17,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            iconTheme: const IconThemeData(color: Colors.black),
+            iconTheme: const IconThemeData(color: Colors.white),
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -25,7 +25,7 @@ class _SettingPageState extends State<SettingPage> {
                 Text(
                   "Setting",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
                 SizedBox(
@@ -33,7 +33,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ],
             ),
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.orange,
             elevation: 0.0,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1.0),

@@ -17,7 +17,8 @@ class _CommunityPageState extends State<CommunityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            iconTheme: const IconThemeData(color: Colors.black),
+            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: Colors.orange,
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -25,7 +26,7 @@ class _CommunityPageState extends State<CommunityPage> {
                 Text(
                   "Comunity",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
                 SizedBox(
@@ -33,7 +34,6 @@ class _CommunityPageState extends State<CommunityPage> {
                 ),
               ],
             ),
-            backgroundColor: Colors.transparent,
             elevation: 0.0,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1.0),

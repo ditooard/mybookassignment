@@ -75,7 +75,11 @@ class _LoadCartPageState extends State<LoadCartPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              "Total Harga: RM ${calculateTotalPriceWithShipping()}",
+              "Total Books:  ${calculateTotalBooks()}",
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "Total Price: RM ${calculateTotalPriceWithShipping()}",
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
@@ -91,6 +95,14 @@ class _LoadCartPageState extends State<LoadCartPage> {
     );
   }
 
+  int calculateTotalBooks() {
+    int totalBooks = 0;
+    for (var cart in cartList) {
+      totalBooks += cart.cartQty;
+    }
+    return totalBooks;
+  }
+
   double calculateTotalPrice(int index) {
     double total =
         (cartList[index].cartQty.toDouble() * cartList[index].bookPrice) +
@@ -99,7 +111,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
   }
 
   double calculateShippingCost(int quantity) {
-    return 10.0 * quantity; // Ongkos kirim RM10 per buku
+    return 10.0; 
   }
 
   double calculateTotalPriceWithShipping() {
@@ -118,7 +130,6 @@ class _LoadCartPageState extends State<LoadCartPage> {
     )
         .then((response) {
       log(response.body);
-      print("cekk user id :  $userid");
       if (response.statusCode == 200) {
         log(response.body);
         var data = jsonDecode(response.body);
@@ -144,7 +155,6 @@ class _LoadCartPageState extends State<LoadCartPage> {
   }
 
   void deleteCart(String userid, int index) {
-    final cartId = cartList[index].cartId;
 
     showDialog(
       context: context,

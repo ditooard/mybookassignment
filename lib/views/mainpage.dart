@@ -51,9 +51,9 @@ class _MainPageState extends State<MainPage> {
     }
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: buildSearchBar(),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.orange,
         elevation: 0.0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
@@ -64,7 +64,7 @@ class _MainPageState extends State<MainPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.black),
+            icon: Icon(Icons.search, color: Colors.white),
             onPressed: () {
               setState(() {
                 isSearchVisible = !isSearchVisible;
@@ -178,7 +178,8 @@ class _MainPageState extends State<MainPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: loadChart,
-        child: const Icon(Icons.shopping_cart),
+        child: const Icon(Icons.shopping_cart, color: Colors.white,),
+        backgroundColor: Colors.orange,
       ),
     );
   }
@@ -293,7 +294,7 @@ class _MainPageState extends State<MainPage> {
               child: Text(
                 "Books List",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 20.0,
                 ),
               ),
