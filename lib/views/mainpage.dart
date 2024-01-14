@@ -193,9 +193,10 @@ class _MainPageState extends State<MainPage> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoadCartPage(
-          userdata : widget.userdata,
-        )),
+        MaterialPageRoute(
+            builder: (context) => LoadCartPage(
+                  userdata: widget.userdata,
+                )),
       );
     }
   }
@@ -271,6 +272,7 @@ class _MainPageState extends State<MainPage> {
           });
           numofpage = int.parse(data['numofpage'].toString());
           numofresult = int.parse(data['numberofresult'].toString());
+          print(response.body);
         } else {
           //if no status failed
         }

@@ -1,9 +1,9 @@
 class Cart {
-  int cartId;
-  int bookId;
+  String cartId;
+  String bookId;
   int cartQty;
   String bookTitle;
-  double bookPrice;
+  int bookPrice; 
 
   Cart({
     required this.cartId,
@@ -17,9 +17,9 @@ class Cart {
     return Cart(
       cartId: json['cart_id'],
       bookId: json['book_id'],
-      cartQty: json['cart_qty'],
+      cartQty: int.tryParse(json['cart_qty'].toString()) ?? 0,
       bookTitle: json['book_title'],
-      bookPrice: json['book_price'].toDouble(),
+      bookPrice: int.tryParse(json['book_price'].toString()) ?? 0,
     );
   }
 }
