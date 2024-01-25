@@ -5,6 +5,7 @@ import 'package:mybookassignment/models/cart.dart';
 import 'package:mybookassignment/models/user.dart';
 import 'package:mybookassignment/shared/myserverconfig.dart';
 import 'package:http/http.dart' as http;
+import 'package:mybookassignment/views/billscreen.dart';
 
 class LoadCartPage extends StatefulWidget {
   final User userdata;
@@ -16,6 +17,7 @@ class LoadCartPage extends StatefulWidget {
 
 class _LoadCartPageState extends State<LoadCartPage> {
   List<Cart> cartList = <Cart>[];
+  double total = 0.0;
 
   @override
   void initState() {
@@ -26,6 +28,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userid = widget.userdata.userid ?? "defaultUserID";
     return Scaffold(
       appBar: AppBar(
         title: Text("Shopping Cart"),
@@ -83,12 +86,17 @@ class _LoadCartPageState extends State<LoadCartPage> {
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Fungsi untuk melanjutkan ke proses pembayaran atau tindakan selanjutnya
-                // bisa ditambahkan di sini
-              },
-              child: Text("Checkout"),
-            ),
+                onPressed: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (content) => BillScreen(
+                                user: widget.userdata,
+                                totalprice: total
+                              )));
+                  loadCart(userid);
+                },
+                child: const Text("Pay Now"))
           ],
         ),
       ),
@@ -111,7 +119,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
   }
 
   double calculateShippingCost(int quantity) {
-    return 10.0; 
+    return 10.0;
   }
 
   double calculateTotalPriceWithShipping() {
@@ -155,7 +163,6 @@ class _LoadCartPageState extends State<LoadCartPage> {
   }
 
   void deleteCart(String userid, int index) {
-
     showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -1,3 +1,3 @@
 class MyServerConfig {
-  static const String server = "http://192.168.8.100";
+  static const String server = "http://bookshelf.wedmanagement.com/";
 }
