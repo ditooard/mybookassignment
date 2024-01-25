@@ -22,13 +22,16 @@ class _BillScreenState extends State<BillScreen> {
   @override
   void initState() {
     super.initState();
-    print(widget.user.useremail);
+    print(widget.user.phone);
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadRequest(
         Uri.parse(
-            '${MyServerConfig.server}/bookbytes/php/payment_update.php?&userid=${widget.user.userid}&email=${widget.user.useremail}&name=${widget.user.username}&amount=${widget.totalprice}'),
+            '${MyServerConfig.server}/api/payment.php?&userid=${widget.user.userid}&email=${widget.user.useremail}&name=${widget.user.username}&mobile=${widget.user.phone}&amount=${widget.totalprice}'),
       );
+    print(widget.user.userid);
+    print(widget.totalprice);
+    
   }
 
   @override

@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
     String _pass = _passEditingController.text;
 
     http.post(
-      Uri.parse("${MyServerConfig.server}/mybookassignment/php/login_user.php"),
+      Uri.parse("${MyServerConfig.server}/api/login_user.php"),
       body: {"email": _email, "password": _pass},
     ).then((response) {
       print(response.statusCode);

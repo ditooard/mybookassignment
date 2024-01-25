@@ -17,7 +17,6 @@ class LoadCartPage extends StatefulWidget {
 
 class _LoadCartPageState extends State<LoadCartPage> {
   List<Cart> cartList = <Cart>[];
-  double total = 0.0;
 
   @override
   void initState() {
@@ -92,7 +91,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
                       MaterialPageRoute(
                           builder: (content) => BillScreen(
                                 user: widget.userdata,
-                                totalprice: total
+                                totalprice: calculateTotalPriceWithShipping()
                               )));
                   loadCart(userid);
                 },
@@ -134,7 +133,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
     http
         .get(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/load_cart.php?userid=$userid"),
+          "${MyServerConfig.server}/api/load_cart.php?userid=$userid"),
     )
         .then((response) {
       log(response.body);
@@ -196,7 +195,7 @@ class _LoadCartPageState extends State<LoadCartPage> {
 
     http
         .delete(Uri.parse(
-            "${MyServerConfig.server}/mybookassignment/php/delete_cart.php?userid=$userid&cartid=$cartId"))
+            "${MyServerConfig.server}/api/delete_cart.php?userid=$userid&cartid=$cartId"))
         .then((response) {
       log(response.body);
       print("cekk user id :  $userid");

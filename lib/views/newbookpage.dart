@@ -415,7 +415,7 @@ class _NewBookPageState extends State<NewBookPage> {
 
     http.post(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/insert_book.php"),
+          "${MyServerConfig.server}/api/insert_book.php"),
       body: {
         "userid": widget.userdata.userid.toString(),
         "isbn": isbn,

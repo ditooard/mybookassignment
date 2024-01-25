@@ -161,7 +161,7 @@ class _BookDetailsState extends State<BookDetails> {
                 height: screenHeight * 0.4,
                 width: screenWidth,
                 child: Image.network(
-                  "${MyServerConfig.server}/mybookassignment/assets/books/${widget.book.bookId}.png",
+                  "${MyServerConfig.server}/assets/books/${widget.book.bookId}.png",
                   fit: BoxFit.fill,
                 ),
               ),
@@ -309,7 +309,7 @@ class _BookDetailsState extends State<BookDetails> {
   void deleteBook() {
     http.post(
         Uri.parse(
-            "${MyServerConfig.server}/mybookassignment/php/delete_book.php"),
+            "${MyServerConfig.server}/api/delete_book.php"),
         body: {
           "userid": widget.user.userid.toString(),
           "bookid": widget.book.bookId.toString(),
@@ -378,7 +378,7 @@ class _BookDetailsState extends State<BookDetails> {
   void insertToCart() {
     http.post(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/insert_cart.php"),
+          "${MyServerConfig.server}/api/insert_cart.php"),
       body: {
         "userid": widget.user.userid.toString(),
         "book_id": widget.book.bookId.toString(),

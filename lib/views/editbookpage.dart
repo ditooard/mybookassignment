@@ -78,7 +78,7 @@ class _EditBookPageState extends State<EditBookPage> {
                                 fit: BoxFit.fill,
                                 image: _image == null
                                     ? NetworkImage(
-                                        "${MyServerConfig.server}/mybookassignment/assets/books/${widget.book.bookId}.png")
+                                        "${MyServerConfig.server}/assets/books/${widget.book.bookId}.png")
                                     : FileImage(_image!) as ImageProvider)),
                       ),
                     ),
@@ -421,7 +421,7 @@ class _EditBookPageState extends State<EditBookPage> {
     }
 
     http.post(
-        Uri.parse("${MyServerConfig.server}/mybookassignment/php/update_book.php"),
+        Uri.parse("${MyServerConfig.server}/api/update_book.php"),
         body: {
           "bookid": widget.book.bookId,
           "userid": widget.user.userid.toString(),

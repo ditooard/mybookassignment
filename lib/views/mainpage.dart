@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MainPage extends StatefulWidget {
+  
   final User userdata;
   const MainPage({super.key, required this.userdata});
 
@@ -117,7 +118,7 @@ class _MainPageState extends State<MainPage> {
                                     padding: const EdgeInsets.all(4.0),
                                     child: Image.network(
                                         fit: BoxFit.fill,
-                                        "${MyServerConfig.server}/mybookassignment/assets/books/${bookList[index].bookId}.png"),
+                                        "${MyServerConfig.server}/assets/books/${bookList[index].bookId}.png"),
                                   ),
                                 ),
                                 Flexible(
@@ -233,7 +234,7 @@ class _MainPageState extends State<MainPage> {
     http
         .get(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/load_books.php?title=$title&author=$author&pageno=$curpage&"),
+          "${MyServerConfig.server}/api/load_books.php?title=$title&author=$author&pageno=$curpage&"),
     )
         .then((response) {
       log(response.body);
@@ -259,7 +260,7 @@ class _MainPageState extends State<MainPage> {
     http
         .get(
       Uri.parse(
-          "${MyServerConfig.server}/mybookassignment/php/load_books.php?title=$title&author=$author&pageno=$curpage&"),
+          "${MyServerConfig.server}/api/load_books.php?title=$title&author=$author&pageno=$curpage&"),
     )
         .then((response) {
       log(response.body);
