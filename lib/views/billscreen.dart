@@ -29,9 +29,6 @@ class _BillScreenState extends State<BillScreen> {
         Uri.parse(
             '${MyServerConfig.server}/api/payment.php?&userid=${widget.user.userid}&email=${widget.user.useremail}&name=${widget.user.username}&mobile=${widget.user.phone}&amount=${widget.totalprice}'),
       );
-    print(widget.user.userid);
-    print(widget.totalprice);
-    
   }
 
   @override

@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 
-import '../models/user.dart';
-import '../shared/mydrawer.dart';
+import '../../models/user.dart';
+import '../../shared/mydrawer.dart';
 
-class CommunityPage extends StatefulWidget {
+class SettingPage extends StatefulWidget {
   final User userdata;
 
-  const CommunityPage({super.key, required this.userdata});
+  const SettingPage({super.key, required this.userdata});
 
   @override
-  State<CommunityPage> createState() => _CommunityPageState();
+  State<SettingPage> createState() => _SettingPageState();
 }
 
-class _CommunityPageState extends State<CommunityPage> {
+class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
-            backgroundColor: Colors.orange,
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //CircleAvatar(backgroundImage: AssetImage('')),
                 Text(
-                  "Comunity",
+                  "Setting",
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -34,6 +33,7 @@ class _CommunityPageState extends State<CommunityPage> {
                 ),
               ],
             ),
+            backgroundColor: Colors.orange,
             elevation: 0.0,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1.0),
@@ -43,11 +43,11 @@ class _CommunityPageState extends State<CommunityPage> {
               ),
             )),
         drawer: MyDrawer(
-          page: "community",
+          page: "setting",
           userdata: widget.userdata,
         ),
         body: const Center(
-          child: Text("COMMUNITY PAGE"),
+          child: Text("SETTING PAGE"),
         ));
   }
 }

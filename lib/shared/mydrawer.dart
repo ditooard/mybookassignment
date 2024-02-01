@@ -1,11 +1,11 @@
 import 'package:mybookassignment/views/loginpage.dart';
 import 'package:mybookassignment/views/profilepage.dart';
-import 'package:mybookassignment/views/sellerpage.dart';
+import 'package:mybookassignment/views/undevelop/sellerpage.dart';
 import 'package:mybookassignment/views/registrationpage.dart';
-import 'package:mybookassignment/views/settingpage.dart';
+import 'package:mybookassignment/views/undevelop/settingpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../views/communitypage.dart';
+import '../views/undevelop/communitypage.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../views/mainpage.dart';

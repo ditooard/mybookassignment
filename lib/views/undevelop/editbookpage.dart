@@ -1,22 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:http/http.dart' as http;
-import '../models/user.dart';
-import '../shared/myserverconfig.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../models/book.dart';
+import '../../models/user.dart';
+import '../../shared/myserverconfig.dart';
 
-class NewBookPage extends StatefulWidget {
-  final User userdata;
+class EditBookPage extends StatefulWidget {
+  final Book book;
+  final User user;
 
-  const NewBookPage({super.key, required this.userdata});
+  const EditBookPage({super.key, required this.book, required this.user});
 
   @override
-  State<NewBookPage> createState() => _NewBookPageState();
+  State<EditBookPage> createState() => _EditBookPageState();
 }
 
-class _NewBookPageState extends State<NewBookPage> {
+class _EditBookPageState extends State<EditBookPage> {
   late double screenWidth, screenHeight;
 
   File? _image;
@@ -36,12 +38,25 @@ class _NewBookPageState extends State<NewBookPage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    isbnCtrl.text = widget.book.bookIsbn.toString();
+    titleCtrl.text = widget.book.bookTitle.toString();
+    descCtrl.text = widget.book.bookDesc.toString();
+    authCtrl.text = widget.book.bookAuthor.toString();
+    priceCtrl.text = widget.book.bookPrice.toString();
+    qtyCtrl.text = widget.book.bookQty.toString();
+    dropdownvalue = widget.book.bookStatus.toString();
+  }
+
+  @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      appBar: AppBar(title: const Text("New Book")),
+      appBar: AppBar(
+        title: const Text("Edit Book"),
+      ),
       body: SingleChildScrollView(
         child: Container(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -57,19 +72,19 @@ class _NewBookPageState extends State<NewBookPage> {
                       },
                       child: Container(
                         height: screenHeight * 0.3,
-                        width: screenWidth * 0.8,
+                        width: screenWidth * 0.9,
                         decoration: BoxDecoration(
                             image: DecorationImage(
-                                fit: BoxFit.scaleDown,
+                                fit: BoxFit.fill,
                                 image: _image == null
-                                    ? const AssetImage(
-                                        "assets/images/camera.png")
+                                    ? NetworkImage(
+                                        "${MyServerConfig.server}/assets/books/${widget.book.bookId}.png")
                                     : FileImage(_image!) as ImageProvider)),
                       ),
                     ),
                   ),
                   const Text(
-                    "Add New Book",
+                    "Edit Book",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   TextFormField(
@@ -148,44 +163,40 @@ class _NewBookPageState extends State<NewBookPage> {
                     children: [
                       Flexible(
                           flex: 3,
-                          child: Container(
-                            child: TextFormField(
-                                textInputAction: TextInputAction.next,
-                                validator: (val) =>
-                                    val!.isEmpty || (val.length < 3)
-                                        ? "Book price must contain value"
-                                        : null,
-                                onFieldSubmitted: (v) {},
-                                controller: priceCtrl,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                    labelText: 'Book Price',
-                                    labelStyle: TextStyle(),
-                                    icon: Icon(Icons.money),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 2.0),
-                                    ))),
-                          )),
+                          child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              validator: (val) =>
+                                  val!.isEmpty || (val.length < 3)
+                                      ? "Book price must contain value"
+                                      : null,
+                              onFieldSubmitted: (v) {},
+                              controller: priceCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  labelText: 'Book Price',
+                                  labelStyle: TextStyle(),
+                                  icon: Icon(Icons.money),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 2.0),
+                                  )))),
                       Flexible(
                           flex: 3,
-                          child: Container(
-                            child: TextFormField(
-                                textInputAction: TextInputAction.next,
-                                validator: (val) =>
-                                    val!.isEmpty || !(int.parse(val) > 0)
-                                        ? "Product price must contain value"
-                                        : null,
-                                onFieldSubmitted: (v) {},
-                                controller: qtyCtrl,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                    labelText: 'Quantity',
-                                    labelStyle: TextStyle(),
-                                    icon: Icon(Icons.add_box),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 2.0),
-                                    ))),
-                          )),
+                          child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              validator: (val) =>
+                                  val!.isEmpty || !(int.parse(val) > 0)
+                                      ? "Product price must contain value"
+                                      : null,
+                              onFieldSubmitted: (v) {},
+                              controller: qtyCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  labelText: 'Quantity',
+                                  labelStyle: TextStyle(),
+                                  icon: Icon(Icons.add_box),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 2.0),
+                                  )))),
                       Flexible(
                         flex: 3,
                         child: SingleChildScrollView(
@@ -216,7 +227,6 @@ class _NewBookPageState extends State<NewBookPage> {
                                       );
                                     }).toList(),
                                     onChanged: (String? newValue) {
-                                      print(newValue);
                                       dropdownvalue = newValue!;
 
                                       setState(() {});
@@ -234,9 +244,9 @@ class _NewBookPageState extends State<NewBookPage> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         fixedSize: Size(screenWidth, 40)),
-                    child: const Text('Add Book'),
+                    child: const Text('Update Book'),
                     onPressed: () {
-                      insertBookDialog();
+                      updateBookDialog();
                     },
                   ),
                 ],
@@ -298,7 +308,6 @@ class _NewBookPageState extends State<NewBookPage> {
       _image = File(pickedFile.path);
       cropImage();
     } else {
-      print('No image selected.');
     }
   }
 
@@ -315,7 +324,6 @@ class _NewBookPageState extends State<NewBookPage> {
 
       cropImage();
     } else {
-      print('No image selected.');
     }
   }
 
@@ -348,17 +356,10 @@ class _NewBookPageState extends State<NewBookPage> {
     }
   }
 
-  void insertBookDialog() {
+  void updateBookDialog() {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please fill in form!!!"),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-    if (_image == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Please take picture!!!"),
         backgroundColor: Colors.red,
       ));
       return;
@@ -370,7 +371,7 @@ class _NewBookPageState extends State<NewBookPage> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: const Text(
-            "Insert new book",
+            "Update this book",
             style: TextStyle(),
           ),
           content: const Text("Are you sure?", style: TextStyle()),
@@ -382,7 +383,7 @@ class _NewBookPageState extends State<NewBookPage> {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                insertBook();
+                updateBook();
               },
             ),
             TextButton(
@@ -404,62 +405,51 @@ class _NewBookPageState extends State<NewBookPage> {
     );
   }
 
-  void insertBook() {
+  void updateBook() {
     String isbn = isbnCtrl.text;
     String title = titleCtrl.text;
     String desc = descCtrl.text;
     String author = authCtrl.text;
     String price = priceCtrl.text;
     String qty = qtyCtrl.text;
-    String imagestr = base64Encode(_image!.readAsBytesSync());
+    String imagestr;
+
+    if (_image != null) {
+      imagestr = base64Encode(_image!.readAsBytesSync());
+    } else {
+      imagestr = "NA";
+    }
 
     http.post(
-      Uri.parse(
-          "${MyServerConfig.server}/api/insert_book.php"),
-      body: {
-        "userid": widget.userdata.userid.toString(),
-        "isbn": isbn,
-        "title": title,
-        "desc": desc,
-        "author": author,
-        "price": price,
-        "qty": qty,
-        "status": dropdownvalue,
-        "image": imagestr
-      },
-    ).then((response) {
+        Uri.parse("${MyServerConfig.server}/api/update_book.php"),
+        body: {
+          "bookid": widget.book.bookId,
+          "userid": widget.user.userid.toString(),
+          "isbn": isbn,
+          "title": title,
+          "desc": desc,
+          "author": author,
+          "price": price,
+          "qty": qty,
+          "status": dropdownvalue,
+          "image": imagestr
+        }).then((response) {
       if (response.statusCode == 200) {
-        var data = response.body;
-        print("Response body: $data");
-
-        try {
-          var jsonData = jsonDecode(data);
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Insert Book Succes."),
+            content: Text("Update Success"),
             backgroundColor: Colors.green,
           ));
-        } catch (e) {
-          print("Error decoding JSON: $e");
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Insert Failed. Error decoding JSON"),
+            content: Text("Update Failed"),
             backgroundColor: Colors.red,
           ));
         }
-      } else {
-        // Penanganan kesalahan status HTTP selain 200
-        print("HTTP Error: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Insert Failed. HTTP Error"),
-          backgroundColor: Colors.red,
-        ));
       }
-    }).catchError((error) {
-      // Penanganan kesalahan selama request
-      print("Error during HTTP request: $error");
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Insert Failed. Error during request"),
-        backgroundColor: Colors.red,
-      ));
     });
   }
 }

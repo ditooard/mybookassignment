@@ -4,6 +4,9 @@ import 'package:mybookassignment/shared/mydrawer.dart';
 import 'package:mybookassignment/views/loginpage.dart';
 import 'package:mybookassignment/views/registrationpage.dart';
 import 'package:flutter/material.dart';
+import 'package:mybookassignment/views/update/updatemail.dart';
+import 'package:mybookassignment/views/update/updatename.dart';
+import 'package:mybookassignment/views/update/updatepass.dart';
 
 import '../models/user.dart';
 
@@ -104,21 +107,42 @@ class _ProfilePageState extends State<ProfilePage> {
                     shrinkWrap: true,
                     children: [
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateNameScreen(),
+                        ),
+                      );
+                    },
                     child: const Text("UPDATE NAME"),
                   ),
                   const Divider(
                     height: 2,
                   ),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateEmailScreen(),
+                        ),
+                      );
+                    },
                     child: const Text("UPDATE EMAIL"),
                   ),
                   const Divider(
                     height: 2,
                   ),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdatePasswordScreen(),
+                        ),
+                      );
+                    },
                     child: const Text("UPDATE PASSWORD"),
                   ),
                   const Divider(

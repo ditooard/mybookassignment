@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/user.dart';
-import '../shared/mydrawer.dart';
+import '../../models/user.dart';
+import '../../shared/mydrawer.dart';
 
 class SellerPage extends StatefulWidget {
   final User userdata;
