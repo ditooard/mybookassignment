@@ -109,11 +109,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   MaterialButton(
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateNameScreen(),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (content) => UpdateNameScreen(
+                                    user: widget.userdata,
+                                  )));
                     },
                     child: const Text("UPDATE NAME"),
                   ),
@@ -123,11 +123,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   MaterialButton(
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateEmailScreen(),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (content) => UpdateEmailScreen(
+                                    user: widget.userdata,
+                                  )));
                     },
                     child: const Text("UPDATE EMAIL"),
                   ),
@@ -137,11 +137,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   MaterialButton(
                     onPressed: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdatePasswordScreen(),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (content) => UpdatePasswordScreen(
+                                    user: widget.userdata,
+                                  )));
                     },
                     child: const Text("UPDATE PASSWORD"),
                   ),

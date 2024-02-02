@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: UpdateEmailScreen(),
-    );
-  }
-}
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:mybookassignment/models/user.dart';
+import 'package:mybookassignment/shared/myserverconfig.dart';
 
 class UpdateEmailScreen extends StatefulWidget {
+  const UpdateEmailScreen({
+    super.key,
+    required this.user,
+  });
+
+  final User user;
   @override
   _UpdateEmailScreenState createState() => _UpdateEmailScreenState();
 }
 
 class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
   TextEditingController _emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                // Tambahkan logika pembaruan email di sini
+                _updateMail();
                 String newEmail = _emailController.text;
                 // Proses pembaruan email
                 print('Email updated to: $newEmail');
@@ -69,5 +67,41 @@ class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
         ),
       ),
     );
+  }
+
+  void _updateMail() {
+    String _email = _emailController.text;
+    String? user_id = widget.user.userid;
+
+    http
+        .put(
+      Uri.parse(
+          "${MyServerConfig.server}/api/useremail_update.php?userid=$user_id&email=$_email"),
+    )
+        .then((response) {
+      print('$_email');
+      print('$user_id');
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          User user = User.fromJson(data['data']);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update email Success"),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update email Failed"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
   }
 }

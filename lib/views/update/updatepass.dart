@@ -1,19 +1,16 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: UpdatePasswordScreen(),
-    );
-  }
-}
+import 'package:mybookassignment/models/user.dart';
+import 'package:mybookassignment/shared/myserverconfig.dart';
 
 class UpdatePasswordScreen extends StatefulWidget {
+  const UpdatePasswordScreen({
+    super.key,
+    required this.user,
+  });
+
+  final User user;
   @override
   _UpdatePasswordScreenState createState() => _UpdatePasswordScreenState();
 }
@@ -21,6 +18,7 @@ class UpdatePasswordScreen extends StatefulWidget {
 class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
   TextEditingController _currentPasswordController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +46,7 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                // Tambahkan logika pembaruan kata sandi di sini
-                String currentPassword = _currentPasswordController.text;
-                String newPassword = _newPasswordController.text;
-                // Proses pembaruan kata sandi
+                _updatePass();
                 print('Password updated successfully.');
                 // Tampilkan pesan sukses atau handle kesalahan jika diperlukan
                 showDialog(
@@ -78,5 +73,40 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
         ),
       ),
     );
+  }
+
+  void _updatePass() {
+    String _currentPass = _currentPasswordController.text;
+    String _newPass = _newPasswordController.text;
+    String? user_id = widget.user.userid;
+
+    http
+        .put(
+      Uri.parse(
+          "${MyServerConfig.server}/api/password_update.php?userid=$user_id&current_password=$_currentPass&password=$_newPass"),
+    )
+        .then((response) {
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          User user = User.fromJson(data['data']);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update Password Success"),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update Password Failed"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
   }
 }

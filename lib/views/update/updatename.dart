@@ -1,25 +1,66 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: UpdateNameScreen(),
-    );
-  }
-}
+import 'package:http/http.dart' as http;
+import 'package:mybookassignment/models/user.dart';
+import 'package:mybookassignment/shared/myserverconfig.dart';
 
 class UpdateNameScreen extends StatefulWidget {
+  const UpdateNameScreen({
+    super.key,
+    required this.user,
+  });
+
+  final User user;
+
   @override
   _UpdateNameScreenState createState() => _UpdateNameScreenState();
 }
 
 class _UpdateNameScreenState extends State<UpdateNameScreen> {
+  final _formKey = GlobalKey<FormState>();
   TextEditingController _nameController = TextEditingController();
+
+  void _updateName() {
+    String _username = _nameController.text;
+    String? user_id = widget.user.userid;
+
+    print('$user_id');
+    print('$_username');
+
+    http
+        .put(
+      Uri.parse(
+          "${MyServerConfig.server}/api/username_update.php?userid=$user_id&username=$_username"),
+    )
+        .then((response) {
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          User user = User.fromJson(data['data']);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update Name Success"),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update Name Failed"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // Handle non-200 status code
+        print("Non-200 status code: ${response.statusCode}");
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,28 +81,7 @@ class _UpdateNameScreenState extends State<UpdateNameScreen> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                // Tambahkan logika pembaruan nama di sini
-                String newName = _nameController.text;
-                // Proses pembaruan nama
-                print('Name updated to: $newName');
-                // Tampilkan pesan sukses atau handle kesalahan jika diperlukan
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Success'),
-                      content: Text('Name updated successfully to $newName.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                _updateName();
               },
               child: Text('Update Name'),
             ),
