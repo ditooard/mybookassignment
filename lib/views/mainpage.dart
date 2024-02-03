@@ -80,7 +80,6 @@ class _MainPageState extends State<MainPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          // Fungsi yang akan dijalankan saat melakukan gestur refresh
           await refreshBooks(author, title);
         },
         child: bookList.isEmpty
@@ -178,7 +177,7 @@ class _MainPageState extends State<MainPage> {
               ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: loadChart,
+        onPressed: newBook,
         child: const Icon(Icons.shopping_cart, color: Colors.white,),
         backgroundColor: Colors.orange,
       ),

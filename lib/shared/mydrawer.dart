@@ -25,11 +25,10 @@ class MyDrawer extends StatefulWidget {
 class _MyDrawerState extends State<MyDrawer> {
   @override
   Widget build(BuildContext context) {
-    bool isUserRegistered = widget.userdata.username == "Unregistered";
+    bool isUserUnregistered = widget.userdata.username == "Unregistered";
 
     void logout() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
       // Hapus data login yang disimpan
       prefs.remove('email');
       prefs.remove('pass');
@@ -87,7 +86,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
             ),
             accountName: Text(
-              isUserRegistered
+              isUserUnregistered
                   ? widget.userdata.username.toString()
                   : widget.userdata.username.toString(),
               style: TextStyle(color: Colors.white), // Ganti warna teks
@@ -98,7 +97,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isUserRegistered
+                    isUserUnregistered
                         ? widget.userdata.useremail.toString()
                         : widget.userdata.useremail.toString(),
                     style: TextStyle(color: Colors.white), // Ganti warna teks
@@ -217,9 +216,9 @@ class _MyDrawerState extends State<MyDrawer> {
           ListTile(
             leading: const Icon(Icons.login_rounded),
             title:
-                isUserRegistered ? const Text('Login') : const Text('Logout'),
+                isUserUnregistered ? const Text('Login') : const Text('Logout'),
             onTap: () {
-              if (isUserRegistered) {
+              if (isUserUnregistered) {
                 print(widget.page.toString());
                 if (widget.page.toString() == "login page") {
                   //  Navigator.pop(context);

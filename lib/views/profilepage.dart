@@ -1,5 +1,9 @@
 //Profile page
 
+import 'dart:io';
+
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mybookassignment/shared/mydrawer.dart';
 import 'package:mybookassignment/views/loginpage.dart';
 import 'package:mybookassignment/views/registrationpage.dart';
@@ -20,6 +24,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late double screenWidth, screenHeight;
+  File? _image;
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +68,26 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.all(4),
               child: Card(
                   child: Row(children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  width: screenWidth * 0.4,
-                  height: screenHeight * 0.4,
-                  child: Image.asset(
-                    'assets/images/profile.png',
-                    color: Colors.orange,
-                    fit: BoxFit.contain,
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: GestureDetector(
+                    onTap: () {
+                      showSelectionDialog();
+                    },
+                    child: Container(
+                      height: 150,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape
+                            .circle, // Mengatur bentuk menjadi lingkaran
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: _image == null
+                              ? const AssetImage("assets/images/camera.png")
+                              : FileImage(_image!) as ImageProvider,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -98,9 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold)),
             ),
-            // const Divider(
-            //   color: Colors.blueGrey,
-            // ),
             Expanded(
                 child: ListView(
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -151,5 +165,106 @@ class _ProfilePageState extends State<ProfilePage> {
                 ])),
           ]),
         ));
+  }
+
+  void showSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            title: const Text(
+              "Select from",
+              style: TextStyle(),
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
+                  child: const Text('Gallery'),
+                  onPressed: () => {
+                    Navigator.of(context).pop(),
+                    _selectfromGallery(),
+                  },
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
+                  child: const Text('Camera'),
+                  onPressed: () => {
+                    Navigator.of(context).pop(),
+                    _selectFromCamera(),
+                  },
+                ),
+              ],
+            ));
+      },
+    );
+  }
+
+  Future<void> _selectfromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 800,
+      maxWidth: 800,
+    );
+
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+      cropImage();
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<void> _selectFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 800,
+      maxWidth: 800,
+    );
+
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+
+      cropImage();
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<void> cropImage() async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: _image!.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset
+            .square, // Mengatur aspek rasio menjadi square (bulat)
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Please Crop Your Image',
+          toolbarColor: Colors.deepOrange,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset
+              .square, // Mengatur aspek rasio awal menjadi square (bulat)
+          lockAspectRatio: true, // Mengunci aspek rasio agar tetap square
+        ),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      File imageFile = File(croppedFile.path);
+      _image = imageFile;
+      setState(() {});
+    }
   }
 }
