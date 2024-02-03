@@ -1,3 +1,5 @@
+import 'package:mybookassignment/models/user_profile.dart';
+import 'package:mybookassignment/shared/myserverconfig.dart';
 import 'package:mybookassignment/views/loginpage.dart';
 import 'package:mybookassignment/views/profilepage.dart';
 import 'package:mybookassignment/views/undevelop/sellerpage.dart';
@@ -10,6 +12,9 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../views/mainpage.dart';
 import 'EnterExitRoute.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:developer';
 
 class MyDrawer extends StatefulWidget {
   final String page;
@@ -23,6 +28,14 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
+  List<UserProfile> userList = <UserProfile>[];
+  @override
+  void initState() {
+    super.initState();
+    final userid = widget.userdata.userid ?? "defaultUserID";
+    loadProfile(userid);
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isUserUnregistered = widget.userdata.username == "Unregistered";
@@ -74,46 +87,33 @@ class _MyDrawerState extends State<MyDrawer> {
         children: [
           UserAccountsDrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.orange, // Ganti warna latar belakang
+              color: Colors.orange,
             ),
             currentAccountPicture: ClipOval(
               child: Image.asset(
-                'assets/images/profile.png', // Ganti dengan path gambar profil kustom Anda
+                'assets/images/profile.png',
                 fit: BoxFit.cover,
                 width: 72.0,
                 height: 72.0,
                 color: Colors.white,
               ),
             ),
-            accountName: Text(
-              isUserUnregistered
-                  ? widget.userdata.username.toString()
-                  : widget.userdata.username.toString(),
-              style: TextStyle(color: Colors.white), // Ganti warna teks
-            ),
-            accountEmail: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isUserUnregistered
-                        ? widget.userdata.useremail.toString()
-                        : widget.userdata.useremail.toString(),
-                    style: TextStyle(color: Colors.white), // Ganti warna teks
-                  ),
-                  Text(
-                    "RM100",
-                    style: TextStyle(color: Colors.white), // Ganti warna teks
-                  ),
-                ],
-              ),
-            ),
+            accountName: userList.isNotEmpty
+                ? Text(
+                    userList[0].username ?? "Unregisteredt",
+                    style: const TextStyle(fontSize: 18),
+                  )
+                : const Text("Unregistered", style: TextStyle(fontSize: 18)),
+            accountEmail: userList.isNotEmpty
+                ? Text(
+                    userList[0].useremail ?? "Unregistered",
+                    style: const TextStyle(fontSize: 18),
+                  )
+                : const Text("Unregistered", style: TextStyle(fontSize: 18)),
             otherAccountsPictures: [
               CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.star,
-                    color: Colors.yellow), // Contoh menambahkan ikon bintang
+                child: Icon(Icons.star, color: Colors.yellow),
               ),
               // Tambahkan widget lain jika diperlukan
             ],
@@ -178,21 +178,18 @@ class _MyDrawerState extends State<MyDrawer> {
             leading: const Icon(Icons.verified_user),
             title: const Text('My Account'),
             onTap: () {
-              print(widget.page.toString());
               Navigator.pop(context);
               if (widget.page.toString() == "account") {
-                //  Navigator.pop(context);
                 return;
               }
               Navigator.pop(context);
-
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (content) => const ProfilePage()));
               Navigator.push(
-                  context,
-                  EnterExitRoute(
-                      exitPage: ProfilePage(userdata: widget.userdata),
-                      enterPage: ProfilePage(userdata: widget.userdata)));
+                context,
+                EnterExitRoute(
+                  exitPage: ProfilePage(userdata: widget.userdata),
+                  enterPage: ProfilePage(userdata: widget.userdata),
+                ),
+              );
             },
           ),
           ListTile(
@@ -219,13 +216,15 @@ class _MyDrawerState extends State<MyDrawer> {
                 isUserUnregistered ? const Text('Login') : const Text('Logout'),
             onTap: () {
               if (isUserUnregistered) {
-                print(widget.page.toString());
                 if (widget.page.toString() == "login page") {
-                  //  Navigator.pop(context);
                   return;
                 }
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (content) => const LoginPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (content) => const LoginPage(),
+                  ),
+                );
               } else {
                 showLogoutConfirmationDialog(context);
               }
@@ -254,5 +253,33 @@ class _MyDrawerState extends State<MyDrawer> {
         ],
       ),
     );
+  }
+
+  void loadProfile(String userid) {
+    http
+        .get(
+      Uri.parse("${MyServerConfig.server}/api/profile.php?userid=$userid"),
+    )
+        .then((response) {
+      log(response.body);
+      if (response.statusCode == 200) {
+        log(response.body);
+        var data = jsonDecode(response.body);
+        print(response.body);
+        if (data['status'] == "success") {
+          var userData = data['data'] as Map<String, dynamic>;
+          // Bersihkan userList sebelum menambahkan data baru
+          userList.clear();
+          // Tambahkan data Map ke userList
+          userList.add(UserProfile.fromJson(userData));
+          print("success");
+
+          // Pastikan untuk memanggil setState agar widget di-refresh
+          setState(() {});
+        } else {
+          print("failed");
+        }
+      }
+    });
   }
 }

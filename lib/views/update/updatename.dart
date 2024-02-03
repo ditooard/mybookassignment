@@ -24,6 +24,13 @@ class _UpdateNameScreenState extends State<UpdateNameScreen> {
   void _updateName() {
     String _username = _nameController.text;
     String? user_id = widget.user.userid;
+    ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update Name Success"),
+              backgroundColor: Colors.green,
+            ),
+          );
+    
 
     print('$user_id');
     print('$_username');

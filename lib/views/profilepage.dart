@@ -1,21 +1,24 @@
 //Profile page
 
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mybookassignment/models/user_profile.dart';
 import 'package:mybookassignment/shared/mydrawer.dart';
-import 'package:mybookassignment/views/loginpage.dart';
-import 'package:mybookassignment/views/registrationpage.dart';
+import 'package:mybookassignment/shared/myserverconfig.dart';
 import 'package:flutter/material.dart';
 import 'package:mybookassignment/views/update/updatemail.dart';
 import 'package:mybookassignment/views/update/updatename.dart';
 import 'package:mybookassignment/views/update/updatepass.dart';
+import 'dart:convert';
+import 'dart:developer';
 
 import '../models/user.dart';
 
 class ProfilePage extends StatefulWidget {
   final User userdata;
+
   const ProfilePage({super.key, required this.userdata});
 
   @override
@@ -23,13 +26,22 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  List<UserProfile> userList = <UserProfile>[];
   late double screenWidth, screenHeight;
   File? _image;
+
+  @override
+  void initState() {
+    super.initState();
+    final userid = widget.userdata.userid ?? "defaultUserID";
+    loadProfile(userid);
+  }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    final userid = widget.userdata.userid ?? "defaultUserID";
     return Scaffold(
         appBar: AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
@@ -61,109 +73,122 @@ class _ProfilePageState extends State<ProfilePage> {
           page: 'account',
           userdata: widget.userdata,
         ),
-        body: Center(
-          child: Column(children: [
-            Container(
-              height: screenHeight * 0.25,
-              padding: const EdgeInsets.all(4),
-              child: Card(
-                  child: Row(children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                    onTap: () {
-                      showSelectionDialog();
-                    },
-                    child: Container(
-                      height: 150,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        shape: BoxShape
-                            .circle, // Mengatur bentuk menjadi lingkaran
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: _image == null
-                              ? const AssetImage("assets/images/camera.png")
-                              : FileImage(_image!) as ImageProvider,
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await refreshProfile(userid);
+          },
+          child: Center(
+            child: Column(children: [
+              Container(
+                height: screenHeight * 0.25,
+                padding: const EdgeInsets.all(4),
+                child: Card(
+                    child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: GestureDetector(
+                      onTap: () {
+                        showSelectionDialog();
+                      },
+                      child: Container(
+                        height: 150,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          shape: BoxShape
+                              .circle, // Mengatur bentuk menjadi lingkaran
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: _image == null
+                                ? const AssetImage("assets/images/camera.png")
+                                : FileImage(_image!) as ImageProvider,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
+                  Expanded(
                     flex: 7,
-                    child: Column(
-                      children: [
-                        Text(
-                          widget.userdata.username.toString(),
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const Divider(
-                          color: Colors.blueGrey,
-                        )
-                      ],
-                    ))
-              ])),
-            ),
-            Container(
-              height: screenHeight * 0.035,
-              alignment: Alignment.center,
-              color: Colors.orange,
-              width: screenWidth,
-              child: const Text("UPDATE ACCOUNT",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-            Expanded(
-                child: ListView(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    shrinkWrap: true,
-                    children: [
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (content) => UpdateNameScreen(
-                                    user: widget.userdata,
-                                  )));
-                    },
-                    child: const Text("UPDATE NAME"),
-                  ),
-                  const Divider(
-                    height: 2,
-                  ),
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (content) => UpdateEmailScreen(
-                                    user: widget.userdata,
-                                  )));
-                    },
-                    child: const Text("UPDATE EMAIL"),
-                  ),
-                  const Divider(
-                    height: 2,
-                  ),
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (content) => UpdatePasswordScreen(
-                                    user: widget.userdata,
-                                  )));
-                    },
-                    child: const Text("UPDATE PASSWORD"),
-                  ),
-                  const Divider(
-                    height: 2,
-                  ),
+                    child: ListView.builder(
+                      itemCount: userList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        UserProfile user = userList[index];
+                        return Column(
+                          children: [
+                            Text(
+                              '${user.username ?? "N/A"}',
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            // Tambahkan Text Widgets untuk properti lainnya seperti username, phone, dll.
+                            const Divider(
+                              color: Colors.blueGrey,
+                            )
+                          ],
+                        );
+                      },
+                    ),
+                  )
                 ])),
-          ]),
+              ),
+              Container(
+                height: screenHeight * 0.035,
+                alignment: Alignment.center,
+                color: Colors.orange,
+                width: screenWidth,
+                child: const Text("UPDATE ACCOUNT",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(
+                  child: ListView(
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      shrinkWrap: true,
+                      children: [
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (content) => UpdateNameScreen(
+                                      user: widget.userdata,
+                                    )));
+                      },
+                      child: const Text("UPDATE NAME"),
+                    ),
+                    const Divider(
+                      height: 2,
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (content) => UpdateEmailScreen(
+                                      user: widget.userdata,
+                                    )));
+                      },
+                      child: const Text("UPDATE EMAIL"),
+                    ),
+                    const Divider(
+                      height: 2,
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (content) => UpdatePasswordScreen(
+                                      user: widget.userdata,
+                                    )));
+                      },
+                      child: const Text("UPDATE PASSWORD"),
+                    ),
+                    const Divider(
+                      height: 2,
+                    ),
+                  ])),
+            ]),
+          ),
         ));
   }
 
@@ -266,5 +291,61 @@ class _ProfilePageState extends State<ProfilePage> {
       _image = imageFile;
       setState(() {});
     }
+  }
+
+  void loadProfile(String userid) {
+    http
+        .get(
+      Uri.parse("${MyServerConfig.server}/api/profile.php?userid=$userid"),
+    )
+        .then((response) {
+      log(response.body);
+      if (response.statusCode == 200) {
+        log(response.body);
+        var data = jsonDecode(response.body);
+        print(response.body);
+        if (data['status'] == "success") {
+          var userData = data['data'] as Map<String, dynamic>;
+          // Bersihkan userList sebelum menambahkan data baru
+          userList.clear();
+          // Tambahkan data Map ke userList
+          userList.add(UserProfile.fromJson(userData));
+          print("success");
+
+          // Pastikan untuk memanggil setState agar widget di-refresh
+          setState(() {});
+        } else {
+          print("failed");
+        }
+      }
+    });
+  }
+
+  Future<void> refreshProfile(String userid) async {
+    http
+        .get(
+      Uri.parse("${MyServerConfig.server}/api/profile.php?userid=$userid"),
+    )
+        .then((response) {
+      log(response.body);
+      if (response.statusCode == 200) {
+        log(response.body);
+        var data = jsonDecode(response.body);
+        print(response.body);
+        if (data['status'] == "success") {
+          var userData = data['data'] as Map<String, dynamic>;
+          // Bersihkan userList sebelum menambahkan data baru
+          userList.clear();
+          // Tambahkan data Map ke userList
+          userList.add(UserProfile.fromJson(userData));
+          print("success");
+
+          // Pastikan untuk memanggil setState agar widget di-refresh
+          setState(() {});
+        } else {
+          print("failed");
+        }
+      }
+    });
   }
 }

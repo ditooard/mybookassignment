@@ -79,6 +79,12 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
     String _currentPass = _currentPasswordController.text;
     String _newPass = _newPasswordController.text;
     String? user_id = widget.user.userid;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Update Password Success"),
+        backgroundColor: Colors.green,
+      ),
+    );
 
     http
         .put(

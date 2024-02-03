@@ -72,7 +72,12 @@ class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
   void _updateMail() {
     String _email = _emailController.text;
     String? user_id = widget.user.userid;
-
+    ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Update email Success"),
+              backgroundColor: Colors.green,
+            ),
+          );
     http
         .put(
       Uri.parse(

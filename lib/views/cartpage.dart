@@ -198,13 +198,11 @@ class _LoadCartPageState extends State<LoadCartPage> {
             "${MyServerConfig.server}/api/delete_cart.php?userid=$userid&cartid=$cartId"))
         .then((response) {
       log(response.body);
-      print("cekk user id :  $userid");
       if (response.statusCode == 200) {
         log(response.body);
         var data = jsonDecode(response.body);
         print(response.body);
         if (data['status'] == "success") {
-          // Update cartList without the deleted item
           setState(() {
             cartList.removeAt(index);
           });

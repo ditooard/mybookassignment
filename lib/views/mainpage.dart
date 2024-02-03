@@ -177,7 +177,7 @@ class _MainPageState extends State<MainPage> {
               ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: newBook,
+        onPressed: loadChart,
         child: const Icon(Icons.shopping_cart, color: Colors.white,),
         backgroundColor: Colors.orange,
       ),
