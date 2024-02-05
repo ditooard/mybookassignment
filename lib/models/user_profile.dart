@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class UserProfile {
   String? userid;
   String? useremail;
@@ -5,6 +7,7 @@ class UserProfile {
   String? phone;
   String? userpassword;
   String? userdatereg;
+  String? userphoto;
 
   UserProfile(
       {this.userid,
@@ -12,7 +15,8 @@ class UserProfile {
       this.username,
       this.phone,
       this.userpassword,
-      this.userdatereg});
+      this.userdatereg,
+      this.userphoto});
 
   UserProfile.fromJson(Map<String, dynamic> json) {
     userid = json['user_id'];
@@ -21,6 +25,7 @@ class UserProfile {
     phone = json['user_phone'];
     userpassword = json['user_password'];
     userdatereg = json['user_datereg'];
+    userphoto = json['user_photo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +36,7 @@ class UserProfile {
     data['user_phone'] = phone;
     data['user_password'] = userpassword;
     data['user_datereg'] = userdatereg;
+    data['user_photo'] = userphoto;
     return data;
   }
 }

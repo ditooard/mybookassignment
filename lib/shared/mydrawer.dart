@@ -90,12 +90,11 @@ class _MyDrawerState extends State<MyDrawer> {
               color: Colors.orange,
             ),
             currentAccountPicture: ClipOval(
-              child: Image.asset(
-                'assets/images/profile.png',
+              child: Image.network(
+                "${MyServerConfig.server}/assets/avatar/${userList.isNotEmpty ? userList[0].userphoto ?? "assets/images/camera.png" : "assets/images/camera.png"}",
                 fit: BoxFit.cover,
-                width: 72.0,
-                height: 72.0,
-                color: Colors.white,
+                width: 50, // adjust the size as needed
+                height: 50, // adjust the size as needed
               ),
             ),
             accountName: userList.isNotEmpty

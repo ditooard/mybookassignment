@@ -13,7 +13,6 @@ import 'package:mybookassignment/views/update/updatename.dart';
 import 'package:mybookassignment/views/update/updatepass.dart';
 import 'dart:convert';
 import 'dart:developer';
-
 import '../models/user.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -80,54 +79,80 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Center(
             child: Column(children: [
               Container(
-                height: screenHeight * 0.25,
+                height: screenHeight * 0.29,
                 padding: const EdgeInsets.all(4),
                 child: Card(
-                    child: Row(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: GestureDetector(
-                      onTap: () {
-                        showSelectionDialog();
-                      },
-                      child: Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(
-                          shape: BoxShape
-                              .circle, // Mengatur bentuk menjadi lingkaran
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: _image == null
-                                ? const AssetImage("assets/images/camera.png")
-                                : FileImage(_image!) as ImageProvider,
+                  child: Row(
+                    children: [
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(0),
+                            child: GestureDetector(
+                              onTap: () {
+                                showSelectionDialog();
+                              },
+                              child: Container(
+                                height: 150,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(
+                                      "${MyServerConfig.server}/assets/avatar/${userList.isNotEmpty ? userList[0].userphoto ?? "assets/images/camera.png" : "assets/images/camera.png"}",
+                                    ) as ImageProvider,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.all(0),
+                            child: TextButton(
+                              onPressed: () {
+                                if (_image != null) {
+                                  insertPhotos(context, userid, _image!);
+                                } else {
+                                  print("Error: Image kosong");
+                                  // Handle the case where _image is empty, you can display a message or take appropriate action.
+                                }
+                              },
+                              child: Text(
+                                'Upload Foto',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Upload Photo Button
+
+                      Expanded(
+                        flex: 7,
+                        child: ListView.builder(
+                          itemCount: userList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            UserProfile user = userList[index];
+                            return Column(
+                              children: [
+                                Text(
+                                  '${user.username ?? "N/A"}',
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                                // Add Text Widgets for other properties like username, phone, etc.
+                                const Divider(
+                                  color: Colors.blueGrey,
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 7,
-                    child: ListView.builder(
-                      itemCount: userList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        UserProfile user = userList[index];
-                        return Column(
-                          children: [
-                            Text(
-                              '${user.username ?? "N/A"}',
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                            // Tambahkan Text Widgets untuk properti lainnya seperti username, phone, dll.
-                            const Divider(
-                              color: Colors.blueGrey,
-                            )
-                          ],
-                        );
-                      },
-                    ),
-                  )
-                ])),
+                ),
               ),
               Container(
                 height: screenHeight * 0.035,
@@ -346,6 +371,50 @@ class _ProfilePageState extends State<ProfilePage> {
           print("failed");
         }
       }
+    });
+  }
+
+  void insertPhotos(BuildContext context, String userId, File _image) {
+    // Mengekstrak data gambar dari file dan mengonversinya menjadi string base64.
+    String imagestr = base64Encode(_image!.readAsBytesSync());
+
+    http.post(
+      Uri.parse(
+          "${MyServerConfig.server}/api/profilepic_update.php?userid=$userId"),
+      body: {"avatar": imagestr},
+    ).then((response) {
+      if (response.statusCode == 200) {
+        var data = response.body;
+        print("Response body: $data");
+
+        try {
+          var jsonData = jsonDecode(data);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Insert Photos Success."),
+            backgroundColor: Colors.green,
+          ));
+        } catch (e) {
+          print("Error decoding JSON: $e");
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Insert Failed. Error decoding JSON"),
+            backgroundColor: Colors.red,
+          ));
+        }
+      } else {
+        // Penanganan kesalahan status HTTP selain 200
+        print("HTTP Error: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Insert Failed. HTTP Error"),
+          backgroundColor: Colors.red,
+        ));
+      }
+    }).catchError((error) {
+      // Penanganan kesalahan selama request
+      print("Error during HTTP request: $error");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Insert Failed. Error during request"),
+        backgroundColor: Colors.red,
+      ));
     });
   }
 }
